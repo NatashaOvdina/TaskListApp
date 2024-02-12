@@ -11,6 +11,8 @@ final class TaskListViewController: UITableViewController {
     private var taskList: [ToDoTask] = []
     private let cellID = "task"
     
+    private let sessionManager = SessionManager.shared
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellID)
@@ -24,16 +26,15 @@ final class TaskListViewController: UITableViewController {
     }
     
     private func fetchData() {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let fetchRequest = ToDoTask.fetchRequest()
         
         do {
-           taskList = try appDelegate.persistentContainer.viewContext.fetch(fetchRequest)
+            taskList = try sessionManager.persistentContainer.viewContext.fetch(fetchRequest)
         } catch {
             print(error)
         }
     }
-    
+
     private func showAlert(withTitle title: String, andMessage message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let saveAction = UIAlertAction(title: "Save Task", style: .default) { [unowned self] _ in
@@ -51,14 +52,14 @@ final class TaskListViewController: UITableViewController {
     
     private func save(_ taskName: String) {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let task = ToDoTask(context: appDelegate.persistentContainer.viewContext)
+        let task = ToDoTask(context: sessionManager.persistentContainer.viewContext)
         task.title = taskName
         taskList.append(task)
         
         let indexPath = IndexPath(row: taskList.count - 1, section: 0)
         tableView.insertRows(at: [indexPath], with: .automatic)
         
-        appDelegate.saveContext()
+        sessionManager.saveContext()
     }
 }
 
