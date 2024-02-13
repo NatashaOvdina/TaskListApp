@@ -75,6 +75,14 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		424CDC152B7B86C90045645B /* Factories */ = {
+			isa = PBXGroup;
+			children = (
+				A8F9D4E92B7944C700B80334 /* FilledButtonFactory.swift */,
+			);
+			path = Factories;
+			sourceTree = "<group>";
+		};
 		A8F9D4C42B79350400B80334 = {
 			isa = PBXGroup;
 			children = (
@@ -95,7 +103,7 @@
 			isa = PBXGroup;
 			children = (
 				424CDC102B7AB60E0045645B /* ViewControllers */,
-				A8F9D4E92B7944C700B80334 /* FilledButtonFactory.swift */,
+				424CDC152B7B86C90045645B /* Factories */,
 				424CDC142B7AB69F0045645B /* Services */,
 				424CDC0E2B7AB5BE0045645B /* Storyboards */,
 				424CDC0F2B7AB5E70045645B /* App */,

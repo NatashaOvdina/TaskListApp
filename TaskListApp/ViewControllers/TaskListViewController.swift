@@ -22,7 +22,7 @@ final class TaskListViewController: UITableViewController {
     }
     
     @objc private func addNewTask() {
-        showAlert(withTitle: "New Task", andMessage: "What do you want to do&")
+       // SHOW ALERT
     }
     
     private func fetchData() {
@@ -34,24 +34,36 @@ final class TaskListViewController: UITableViewController {
             print(error)
         }
     }
-
-    private func showAlert(withTitle title: String, andMessage message: String) {
+    
+    // MARK: - Private Methods for Alert Controller
+    private func showAlert(title: String,
+                           message: String,
+                           placeholder: String?,
+                           editHandler: (() -> Void)) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let saveAction = UIAlertAction(title: "Save Task", style: .default) { [unowned self] _ in
-            guard let taskName = alert.textFields?.first?.text, !taskName.isEmpty else { return }
-            save(taskName)
+        
+        if let placeholder = placeholder {
+            alert.addTextField { textField in
+                textField.placeholder = placeholder
+            }
+            
+            
+            let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
+                guard let taskName = alert.textFields?.first?.text, !taskName.isEmpty else { return }
+                
+            }
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
+            
+            alert.addAction(saveAction)
+            alert.addAction(cancelAction)
+            
+            
+            present(alert, animated: true)
         }
-        let cancelAction = UIAlertAction(title: "Cancel", style: .destructive)
-        alert.addAction(saveAction)
-        alert.addAction(cancelAction)
-        alert.addTextField { textField in
-            textField.placeholder = "New Task"
-        }
-        present(alert, animated: true)
     }
     
     private func save(_ taskName: String) {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let task = ToDoTask(context: sessionManager.persistentContainer.viewContext)
         task.title = taskName
         taskList.append(task)
@@ -79,6 +91,28 @@ extension TaskListViewController {
     }
 }
 
+// MARK: - UITableViewDelegate
+extension TaskListViewController {
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        .delete
+    }
+    
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            let taskToDelete = taskList[indexPath.row]
+            taskList.remove(at: indexPath.row)
+            
+            do {
+                let context = sessionManager.persistentContainer.viewContext
+                context.delete(taskToDelete)
+                try context.save()
+            } catch {
+                print(error)
+            }
+            tableView.deleteRows(at: [indexPath], with: .fade)
+        }
+    }
+}
 // MARK: - Setup UI
 private extension TaskListViewController {
     func setupNavigationBar() {
